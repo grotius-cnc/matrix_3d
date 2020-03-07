@@ -3,14 +3,14 @@
 be used cross platform and is Codeblocks compatible.
 
 Usage:
-  #include <matrix_3d.h>
-  vec3d trans0=translate_3d(50,5,0,10,0,0);
-  vec3d scale0=scale_3d(50,10,30,2);
-  vec3d rot0=rotate_3d(1,0,0,0,30,53.1);
-  vec3d mir0 = mirror_3d(10,0,0,0,1,0);
-  vec3d shear0 = shearing_3d(1,1,2,2,2,3,1,0,0); //will shear in x axis ==> output : after shearing = (1, 3, 5).
-  vec3d shear0 = shearing_3d(1,1,2,2,2,3,0,1,0); //will shear in y axis
-  vec3d shear0 = shearing_3d(1,1,2,2,2,3,0,0,1); //will shear in z axis
+#include <matrix_3d.h>
+vec3d trans0=translate_3d(50,5,0,10,0,0);
+vec3d scale0=scale_3d(50,10,30,2);
+vec3d rot0=rotate_3d(1,0,0,0,30,53.1);
+vec3d mir0 = mirror_3d(10,0,0,0,1,0);
+vec3d shear0 = shearing_3d(1,1,2,2,2,3,1,0,0); //will shear in x axis ==> output : after shearing = (1, 3, 5).
+vec3d shear0 = shearing_3d(1,1,2,2,2,3,0,1,0); //will shear in y axis
+vec3d shear0 = shearing_3d(1,1,2,2,2,3,0,0,1); //will shear in z axis
 
 Library functions visualized:
 ![0](https://raw.githubusercontent.com/grotius-cnc/matrix_3D/master/3D-Transformation-in-Computer-Graphics.png)
