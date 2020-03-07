@@ -2,6 +2,9 @@
 3d matrix calculations, can be used for 3d matrix manipulation, library is header only, written in C++, tested with QT, but can
 be used cross platform and is Codeblocks compatible.
 
+-No licence
+-Free to use
+
 Usage:
 - #include <matrix_3d.h>
 - vec3d translate = translate_3d(50,5,0,10,0,0);
