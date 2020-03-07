@@ -12,5 +12,4 @@ Usage:
 - vec3d shear0 = shearing_3d(1,1,2,2,2,3,0,1,0); //will shear in y axis.
 - vec3d shear0 = shearing_3d(1,1,2,2,2,3,0,0,1); //will shear in z axis.
 
-Library functions visualized:
 ![0](https://raw.githubusercontent.com/grotius-cnc/matrix_3D/master/3D-Transformation-in-Computer-Graphics.png)
