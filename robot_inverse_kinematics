@@ -1,0 +1,103 @@
+void MainWindow::on_pushButton_inverse_kinematics_pressed()
+{
+
+    double roll=0,pitch=0,yaw=0;
+    double alpha=0,beta=0,gamma=0;
+
+    Chain chain = Chain();
+    chain.addSegment(Segment());
+    chain.addSegment(Segment(Joint(Joint::RotZ), Frame(Vector(500.0,0.0,1045.0))));
+    chain.addSegment(Segment(Joint(Joint::RotY), Frame(Vector(1300.0,0.0,0.0))));
+    chain.addSegment(Segment(Joint(Joint::RotY), Frame(Vector(1025.0,0.0,-55.0))));
+    chain.addSegment(Segment(Joint(Joint::RotX), Frame(Vector(0.0,0.0,0.0))));
+    chain.addSegment(Segment(Joint(Joint::RotY), Frame(Vector(290.0,0.0,0.0))));
+    chain.addSegment(Segment(Joint(Joint::RotZ), Frame(Vector(0.0,0.0,0.0))));
+    chain.addSegment(Segment());
+
+    // Create solver based on kinematic chain
+    ChainFkSolverPos_recursive fksolver = ChainFkSolverPos_recursive(chain);
+
+    // Create joint array
+    unsigned int nj = chain.getNrOfJoints();
+    KDL::JntArray jointpositions = JntArray(nj);
+
+    jointpositions(0)=((0)*M_PI/180.0)*-1; //invert axis
+    jointpositions(1)=(-90)*M_PI/180.0;
+    jointpositions(2)=(90)*M_PI/180.0;
+    jointpositions(3)=(0)*M_PI/180.0;
+    jointpositions(4)=(0)*M_PI/180.0;
+    jointpositions(5)=(0)*M_PI/180.0;
+
+    // Create the frame that will contain the results
+    KDL::Frame cartpos;
+
+    // Calculate forward position kinematics
+    bool kinematics_status;
+    kinematics_status = fksolver.JntToCart(jointpositions,cartpos);
+    if(kinematics_status>=0){
+        //std::cout << cartpos <<std::endl;
+
+        std::cout << "X:"<<cartpos.p.x() << " Y:" << cartpos.p.y() << " Z:"<< cartpos.p.z() << std::endl;
+
+        cartpos.M.GetEulerZYX(yaw,pitch,roll);
+        cartpos.M.GetEulerZYX(alpha,beta,gamma);
+        //std::cout << "EULER Z"<<alpha *(180.0/M_PI) << " Y:"<<beta *(180.0/M_PI)<<" X:"<<gamma *(180.0/M_PI)<<std::endl;
+        cartpos.M.GetEulerZYZ(alpha,beta,gamma);
+        //std::cout << "EULER Z"<<alpha*(180.0/M_PI) << " Y:"<<beta*(180.0/M_PI)<<" Z:"<<gamma*(180.0/M_PI)<<std::endl;
+    }
+
+    //------ inverse kinematics secion ------
+
+
+    //Creation of joint arrays q:
+    KDL::JntArray q(chain.getNrOfJoints());
+    KDL::JntArray q_init(chain.getNrOfJoints());
+    KDL::JntArray q_min(chain.getNrOfJoints());
+    KDL::JntArray q_max(chain.getNrOfJoints());
+    KDL::SetToZero(q_init); //initialize with zero positions
+    //define q_init:
+    q_init(0) = ((0)*M_PI/180.0)*-1;
+    q_init(1) = (-90)*M_PI/180.0;
+    q_init(2) = (90)*M_PI/180.0;
+    q_init(3) = (0)*M_PI/180.0;
+    q_init(4) = (0)*M_PI/180.0;
+    q_init(5) = (0)*M_PI/180.0;
+    q_init(5) = (0)*M_PI/180.0;
+    nj = chain.getNrOfJoints();
+
+    //define minimum and maximum joint positions, measure this values exactly!
+    q_min(0) = -185.0*(M_PI/180);
+    q_max(0) = 185*(M_PI/180);
+    q_min(1) = -130.0*(M_PI/180);
+    q_max(1) = 20*(M_PI/180);
+    q_min(2) = -100.0*(M_PI/180);
+    q_max(2) = 144.0*(M_PI/180);
+    q_min(3) = -350.0*(M_PI/180);
+    q_max(3) = 350.0*(M_PI/180);
+    q_min(4) = -120.0*(M_PI/180);
+    q_max(4) = 120.0*(M_PI/180);
+    q_min(5) = -350.0*(M_PI/180);
+    q_max(5) = 350.0*(M_PI/180);
+
+    //Creation of the solver:
+    //KDL::ChainFkSolverPos_recursive fksolver(chain); //Forward kinematic position solver needed for IK
+    KDL::ChainIkSolverVel_pinv iksolverv(chain); //Inverse velocity solver needed for IK
+    //KDL::ChainIkSolverPos_NR iksolver(kdlChain, fksolver, iksolverv, 100, 1e-6); //max 100 iterations, stop at accuracy 1e-6
+    KDL::ChainIkSolverPos_NR_JL iksolver(chain, q_min, q_max, fksolver, iksolverv, 100, 1e-6);
+
+    //make calculations:
+
+    //define target frame (rotation&translation)
+    //rotation is in Tait-Bryan angles/ZYX Euler
+    KDL::Frame F_dest(KDL::Rotation::EulerZYX(yaw,pitch,roll), KDL::Vector(cartpos.p.x()+double(ui->spinBox->value()),cartpos.p.y()+double(ui->spinBox_2->value()),cartpos.p.z()+double(ui->spinBox_3->value())));
+
+    //Solve IK problem for F_dest
+    int status = iksolver.CartToJnt(q_init, F_dest, q);
+
+    //copy q to pointer
+    if(status>=0){
+        for(unsigned int i=0;i<nj;i++){
+            std::cout<<"solution q(i) "<<  q(i)* (180.0/M_PI)<< std::endl;
+        }
+    }
+}
