@@ -87,3 +87,32 @@ void MainWindow::on_pushButton_forward_kinematics_pressed()
 //    </robot_definition>
 
 }
+
+//extra info, to check your (Segment(Joint(Joint::RotZ), Frame(Vector(...)))) parameters, you could use below code it works with the matrix.h file.
+//6 axis FW Kinematics
+
+//    vec3d J1,J2,J3,J4_J5;
+
+//    double J1rot=ui->spinBox->value(); //rotate around z
+//    double J2rot=ui->spinBox_2->value(); //rotate around y
+//    double J3rot=ui->spinBox_3->value(); //rotate around y
+//    double J4rot=ui->spinBox_4->value(); //rotate around x
+//    double J5rot=ui->spinBox_5->value(); //rotate around y
+
+//    J1=rotate_3d(500,0,1045,0,0,J1rot);
+//    J2=rotate_3d(1300,0,0,0,J2rot,J1rot);
+//    J3=rotate_3d(1025,0,-55,0,J2rot+J3rot,J1rot);
+//    J4_J5=rotate_3d(290,0,0,J4rot,J2rot+J3rot+J5rot,J1rot);
+
+
+//    std::cout<<"POS J1 X:"<<J1.x<<" Y:"<<J1.y<<" Z:"<<J1.z<<std::endl;
+//    std::cout<<"POS J2 X:"<<J1.x+J2.x<<" Y:"<<J1.y+J2.y<<" Z:"<<J1.z+J2.z<<std::endl;
+//    std::cout<<"POS J3 X:"<<J1.x+J2.x+J3.x<<" Y:"<<J1.y+J2.y+J3.y<<" Z:"<<J1.z+J2.z+J3.z<<std::endl;
+//    //std::cout<<"POS J4 X:"<<J1.x+J2.x+J3.x+J4.x<<" Y:"<<J1.y+J2.y+J3.y+J4.y<<" Z:"<<J1.z+J2.z+J3.z+J4.z<<std::endl;
+//    //std::cout<<"POS J5 X:"<<J1.x+J2.x+J3.x+J4.x+J5.x<<" Y:"<<J1.y+J2.y+J3.y+J4.y+J5.y<<" Z:"<<J1.z+J2.z+J3.z+J4.z+J5.z<<std::endl;
+//    std::cout<<"POS J6 X:"<<J1.x+J2.x+J3.x+J4_J5.x<<" Y:"<<J1.y+J2.y+J3.y+J4_J5.y<<" Z:"<<J1.z+J2.z+J3.z+J4_J5.z<<std::endl;
+
+//    std::cout<<"-- "<<std::endl;
+//    std::cout<<"-- "<<std::endl;
+
+//    //kuka kr500
