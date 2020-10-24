@@ -1,0 +1,89 @@
+void MainWindow::on_pushButton_forward_kinematics_pressed()
+{
+    //+https://github.com/orocos/orocos_kinematics_dynamics  KDL
+    //+git clone https://gitlab.com/libeigen/eigen.git
+    //+sudo apt-get install liborocos-kdl-dev
+//    #include "chain.hpp"
+//    #include "chainfksolver.hpp"
+//    #include "chainfksolverpos_recursive.hpp"
+//    #include <chainiksolvervel_pinv.hpp>
+//    #include <chainiksolverpos_nr.hpp>
+//    #include <chainiksolverpos_nr_jl.hpp>
+//    #include "frames_io.hpp"
+//    #include "jntarray.hpp"
+    
+    //Robot type : KUKA 500_3
+
+    Chain chain = Chain();
+    chain.addSegment(Segment());
+    chain.addSegment(Segment(Joint(Joint::RotZ), Frame(Vector(500.0,0.0,1045.0))));
+    chain.addSegment(Segment(Joint(Joint::RotY), Frame(Vector(1300.0,0.0,0.0))));
+    chain.addSegment(Segment(Joint(Joint::RotY), Frame(Vector(1025.0,0.0,-55.0))));
+    chain.addSegment(Segment(Joint(Joint::RotX), Frame(Vector(0.0,0.0,0.0))));
+    chain.addSegment(Segment(Joint(Joint::RotY), Frame(Vector(290.0,0.0,0.0))));
+    chain.addSegment(Segment(Joint(Joint::RotZ), Frame(Vector(0.0,0.0,0.0))));
+    chain.addSegment(Segment());
+
+    // Create solver based on kinematic chain
+    ChainFkSolverPos_recursive fksolver = ChainFkSolverPos_recursive(chain);
+
+    // Create joint array
+    unsigned int nj = chain.getNrOfJoints();
+    KDL::JntArray jointpositions = JntArray(nj);
+
+    jointpositions(0)=((double(ui->spinBox->value()))*M_PI/180.0)*-1; //invert axis
+    jointpositions(1)=(double(ui->spinBox_2->value()))*M_PI/180.0;
+    jointpositions(2)=(double(ui->spinBox_3->value()))*M_PI/180.0;
+    jointpositions(3)=(double(ui->spinBox_4->value()))*M_PI/180.0;
+    jointpositions(4)=(double(ui->spinBox_5->value()))*M_PI/180.0;
+    jointpositions(5)=(double(ui->spinBox_6->value()))*M_PI/180.0;
+
+    // Create the frame that will contain the results
+    KDL::Frame cartpos;
+
+    // Calculate forward position kinematics
+    bool kinematics_status;
+    kinematics_status = fksolver.JntToCart(jointpositions,cartpos);
+    if(kinematics_status>=0){
+        //std::cout << cartpos <<std::endl;
+
+        std::cout << "X:"<<cartpos.p.x() << " Y:" << cartpos.p.y() << " Z:"<< cartpos.p.z() << std::endl;
+
+        double roll,pitch,yaw;
+        cartpos.M.GetEulerZYX(yaw,pitch,roll);
+
+        double alpha,beta,gamma;
+        cartpos.M.GetEulerZYX(alpha,beta,gamma);
+        std::cout << "EULER Z"<<alpha *(180.0/M_PI) << " Y:"<<beta *(180.0/M_PI)<<" X:"<<gamma *(180.0/M_PI)<<std::endl;
+
+        cartpos.M.GetEulerZYZ(alpha,beta,gamma);
+        std::cout << "EULER Z"<<alpha*(180.0/M_PI) << " Y:"<<beta*(180.0/M_PI)<<" Z:"<<gamma*(180.0/M_PI)<<std::endl;
+    }
+    
+    //checked with RoKiSim 1.7 :
+//    <robot_definition>
+//    <robot_dk name=KUKA_KR_500_3>
+//    <axis id="Base" maxvalue="0" minvalue="0" alpha="0" a="0" theta="0" d="0"/>
+//    <axis id="Joint1" limsup="185.000" liminf="-185.000" alpha="0.000" a="0.000" theta="0.000" d="1045.000"/>
+//    <axis id="Joint2" limsup="20.000" liminf="-130.000" alpha="-90.000" a="500.000" theta="0.000" d="0.000"/>
+//    <axis id="Joint3" limsup="144.000" liminf="-100.000" alpha="0.000" a="1300.000" theta="-90.000" d="0.000"/>
+//    <axis id="Joint4" limsup="350.000" liminf="-350.000" alpha="-90.000" a="-55.000" theta="0.000" d="1025.000"/>
+//    <axis id="Joint5" limsup="120.000" liminf="-120.000" alpha="90.000" a="0.000" theta="0.000" d="0.000"/>
+//    <axis id="Joint6" limsup="350.000" liminf="-350.000" alpha="-90.000" a="0.000" theta="180.000" d="290.000"/>
+//    </robot_dk>
+//    <robot_geometry>
+//    <geometry geo="KUKA_KR_500_3-0" name="Base"/>
+//    <geometry geo="KUKA_KR_500_3-1" name="Joint1"/>
+//    <geometry geo="KUKA_KR_500_3-2" name="Joint2"/>
+//    <geometry geo="KUKA_KR_500_3-3" name="Joint3"/>
+//    <geometry geo="KUKA_KR_500_3-4" name="Joint4"/>
+//    <geometry geo="KUKA_KR_500_3-5" name="Joint5"/>
+//    <geometry geo="KUKA_KR_500_3-6" name="Joint6"/>
+//    </robot_geometry>
+//    <CAD_base x="0.000" y="0.000" z="0.000" rx="0.000" ry="0.000" rz="0.000"/>
+//    <CAD_scale FACTOR="1.000000000"/>
+//    <CAD_offsets cad_theta1="0.000" cad_theta2="0.000" cad_theta3="0.000" cad_theta4="0.000" cad_theta5="0.000" cad_theta6="0.000"/>
+//    <Angle_Type id="5"/>
+//    </robot_definition>
+
+}
